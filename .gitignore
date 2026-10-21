@@ -216,3 +216,6 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Local data (large; kept outside the repo by default, see scripts/download_data.py)
+data/
