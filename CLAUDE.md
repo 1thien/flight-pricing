@@ -17,9 +17,15 @@ airline-specific variants as extensions.
 
 ## Languages
 
-Python + SQL (DuckDB) for data, models and the backtest. MATLAB for the
-numerical dynamic-programming solver (backward induction on a Markov chain of
-prices), with convergence studies.
+Python + SQL (DuckDB) for data, models and the backtest. R (`fixest`,
+`ggplot2`, `modelsummary`) for `03_fare_econometrics` only. MATLAB
+(Octave-compatible) for the numerical dynamic-programming solver (backward
+induction on a Markov chain of prices), with convergence studies. The
+optional demo app goes in Streamlit. The full method list per notebook is in
+`docs/project_journal.md`.
+
+Notebook numbering is reading order (01–09). Build order puts the
+resume-critical path first: 04, 05, 06, 09, then 03, 07, 08.
 
 ## Evaluation
 
@@ -65,3 +71,9 @@ prices), with convergence studies.
 - `python scripts/build_parquet.py` writes `processed/itineraries.parquet`,
   sorted by searchDate. Query it with DuckDB or Polars, not by loading the full
   file into pandas.
+- `python scripts/build_cheapest.py` writes `processed/cheapest_daily.parquet`:
+  the cheapest fare per route × flight date × search date (~2M rows). This is
+  the core table for the decision analysis. `flight_pricing.data.connect()`
+  exposes it as the view `cheapest`.
+- Run notebooks with the venv's Python (`.venv/Scripts/python.exe -m
+  nbconvert ...`) and the `flight-pricing` kernel, not the global Python.

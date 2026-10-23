@@ -12,16 +12,67 @@ notebook it names.
 
 ## Where we left off
 
-*Last updated 2026-10-17*
+*Last updated 2026-10-23 (plan day 1)*
 
 - **Done:**
   - Data downloaded and converted (82M rows).
-  - `01_data_overview.ipynb` explains what's in the dataset.
-- **Next:** `02_price_dynamics.ipynb`:
-  - how consistently each itinerary is tracked over time;
-  - how the cheapest fare on a route and date moves as departure approaches;
-  - whether prices jump between fixed levels.
-- **Waiting on me:** nothing right now.
+  - `01_data_overview.ipynb`: what's in the dataset.
+  - `02_price_dynamics.ipynb`: how the cheapest fare moves as departure
+    approaches. Built the core table with `scripts/build_cheapest.py`.
+  - Full plan set: methods per notebook, R for econometrics, faster timeline.
+- **Next:** `04_decision_problem.ipynb` (the buy/wait math, scoring, simple
+  rules, threshold proof), then `05_backtest`.
+- **Waiting on me:** review notebooks 02 and 04.
+
+---
+
+## Timeline (revised 2026-10-23, faster pace)
+
+Notebooks are numbered in reading order, but built in a different order: the
+resume-critical path comes first.
+
+**Phase 1: resume-ready by Oct 26**
+
+| Day | Date | Claude builds | My part (~2–3 h) |
+|---|---|---|---|
+| 1 | Thu Oct 23 | Commit 01–02; `04_decision_problem` with the threshold proof | Review 02 and 04; learn stopping times and the threshold proof |
+| 2 | Fri Oct 24 | `05_backtest`: walk-forward, simple-rule results | Review; learn lookahead bias and walk-forward validation |
+| 3 | Sat Oct 25 | `06_model`: logistic, LightGBM, EV rule, calibration, SHAP | Review; learn logistic regression, calibration, expected value |
+| 4 | Sun Oct 26 | `09_results` v1: bootstrap CIs, paired test, $ and %; README draft; push | Review; **resume bullet with real numbers** |
+
+**Phase 2: interview depth, Oct 27 – Nov 9**
+
+| Days | Dates | Claude builds | My part |
+|---|---|---|---|
+| 5–6 | Oct 27–28 | `03_fare_econometrics` in R (fixed effects, deadline test, day-of-week myth, competition, time series) | Write resume; learn fixed effects and clustered SEs |
+| 7–9 | Oct 29–31 | `07_dynamic_programming`: Markov chain + MATLAB backward induction, convergence and Monte Carlo, jump process, real options | Learn Bellman equation, Markov chains, numerical error (~3–4 h days) |
+| 10–11 | Nov 1–2 | `08_reinforcement_learning`: fitted Q-iteration | Learn Q-learning basics |
+| 12–13 | Nov 3–4 | Extras (survival, empirical Bayes, conformal, clustering, Optuna) as time allows; `09_results` v2 | Review |
+| 14+ | Nov 5–9 | Presentation guide; mock interviews | Practice the 30-second and 2-minute versions |
+
+---
+
+## Resume bullets (drafts, numbers filled in from results)
+
+**Flight Purchase Timing Model** | Python, SQL (DuckDB), LightGBM, MATLAB
+
+- Built a buy-or-wait flight purchasing model on 82M Expedia fare records,
+  framing purchase timing as an optimal-stopping problem; walk-forward
+  backtest showed **$X (Y%) average savings** vs. a buy-now baseline (95%
+  bootstrap CI: $a–$b).
+- Built a data pipeline converting 31 GB of raw fare data to Parquet
+  (31 → 4.5 GB) and querying it with SQL (DuckDB), tracking fares for 235
+  routes over 171 days.
+- Estimated the probability of a price drop with gradient-boosted
+  classifiers, validated with calibration plots and Brier score; used cluster
+  bootstrap CIs to account for correlated prices within routes.
+- Solved the optimal buy/wait rule numerically by backward induction on an
+  estimated Markov chain of prices in MATLAB, verified with grid-refinement
+  convergence and Monte Carlo simulation.
+
+**If the model barely beats the simple rules:** "…found a simple 'buy N days
+out' rule captured Z% of the model's savings." No number goes on the resume
+until the backtest produces it.
 
 ---
 
@@ -49,13 +100,27 @@ American option.
 | Step | What | Where | Status |
 |---|---|---|---|
 | 1 | Get the data | `scripts/download_data.py`, `scripts/build_parquet.py` | Done |
-| 2 | Understand the data | `01_data_overview.ipynb`, `02_price_dynamics.ipynb` | 01 done |
-| 3 | Define the decision precisely (the math) | `03_decision_problem.ipynb` | |
-| 4 | Backtest framework, before any model | `04_backtest.ipynb` | |
-| 5 | Model: chance and size of a drop, expected-value rule | `05_model.ipynb` | |
-| 6 | Numerical dynamic programming (MATLAB) | `matlab/` + `06_dynamic_programming.ipynb` | |
-| 7 | Results: $ and %, bootstrap CIs, vs. simple rules and DP | `07_results.ipynb` | |
-| 8 | Write-up and presentation | `README.md`, this journal | |
+| 2 | Understand the data | `01_data_overview.ipynb`, `02_price_dynamics.ipynb` | Done |
+| 3 | Explain fares: panel econometrics (R) | `03_fare_econometrics.ipynb` | |
+| 4 | Define the decision precisely, with the threshold proof | `04_decision_problem.ipynb` | |
+| 5 | Backtest framework and simple rules, before any model | `05_backtest.ipynb` | |
+| 6 | Model: drop probability, EV rule, calibration, SHAP | `06_model.ipynb` | |
+| 7 | Numerical DP (MATLAB), jump process, real options | `matlab/` + `07_dynamic_programming.ipynb` | |
+| 8 | Offline reinforcement learning | `08_reinforcement_learning.ipynb` | |
+| 9 | Results: $ and %, bootstrap CIs, all strategies compared | `09_results.ipynb` | |
+| 10 | Write-up and presentation | `README.md`, this journal | |
+
+**Methods by notebook**
+
+| Notebook | Math, statistics, econometrics, ML |
+|---|---|
+| 03 | Fixed-effects panel regression, clustered SEs, regression discontinuity / event study at the 21/14/7 deadlines, day-of-week effects, HHI competition, autocorrelation and variance-ratio tests |
+| 04 | Optimal stopping, stopping times, Bellman equation, proof that the best rule is a threshold |
+| 05 | Walk-forward validation, lookahead-bias controls |
+| 06 | Logistic regression, LightGBM, quantile regression (pinball loss), expected-value rule, calibration (reliability, Brier), SHAP; extras: conformal prediction, Optuna tuning, empirical Bayes, route clustering |
+| 07 | Markov chain estimation, backward induction, grid convergence, Monte Carlo error, interpolation, compound Poisson jump process (MLE), real-options value of waiting |
+| 08 | Fitted Q-iteration (offline RL) |
+| 09 | Cluster bootstrap CIs, paired comparison; extra: survival analysis of fare increases |
 
 ---
 
@@ -67,8 +132,20 @@ American option.
 | D2 | Measure savings in **$ and %** (my idea): mean per-trip % and total-$ %, plus by fare band | `CLAUDE.md`; to be shown in `07_results` |
 | D3 | Keep the data outside the repo (OneDrive would upload 31 GB) | This page, below |
 | D4 | Parquet + DuckDB (SQL) instead of loading 82M rows into pandas | This page, below |
-| D5 | The traveler buys the **cheapest option A→B on a date, basic economy included**; flexible-date and airline-specific variants as extensions | `03_decision_problem` (to come) |
+| D5 | The traveler buys the **cheapest option A→B on a date, basic economy included**; flexible-date and airline-specific variants as extensions | `02_price_dynamics` (why not one itinerary), `03_decision_problem` (to come) |
 | D6 | Python + SQL, with MATLAB for numerical DP (Octave-compatible, since the license is through Drexel). No C++, Julia or R for now | This page, below |
+
+| D7 | **R** for the econometrics notebook (`fixest`, `ggplot2`, `modelsummary`) | This page, below |
+| D8 | Optional demo app in **Python (Streamlit)**, since the model is in Python | This page, below |
+| D9 | Backtest starting points: 60, 45, 30, 21 and 14 days out, reported separately. Listed fares, with bag fees noted as a limitation | `04_decision_problem` |
+
+**D7/D8 detail:** Python could do the econometrics (`pyfixest`, `linearmodels`),
+but `fixest` is the standard tool economists use, and its regression tables
+and `ggplot2` charts come out polished. That gives me a real reason to list R.
+R's dashboard strength (Shiny) isn't the reason. The demo app goes in
+Streamlit, because calling a Python model from R adds friction for no
+benefit. Static charts are used in the notebooks and README, since GitHub
+doesn't render interactive ones.
 
 **D3/D4 detail:** the raw CSV is 31 GB and the repo is in OneDrive, so the
 data lives in `~/data/flight-pricing` (changeable with `FLIGHT_DATA_DIR`).
@@ -107,11 +184,13 @@ Each limitation comes with a way to phrase it when presenting.
   should verify how unusual fares were that year before claiming it.
   *Phrase:* "I'd re-run the backtest on other years before trusting it."
 - **US domestic hubs, one-way only.** There are no international routes, small
-  airports or round trips, and I mostly travel internationally.
-  *Phrase:* "The method carries over, but the specific numbers don't.
-  International fares are the next thing I'd test."
-- **One source (Expedia).** Some airlines may not sell through Expedia (to
-  check), and prices booked directly can differ.
+  airports or round trips. See Building on this project.
+- **One source (Expedia).** Southwest doesn't appear at all. My guess is that
+  it doesn't sell through Expedia, so a major low-fare airline is missing.
+  Prices booked directly can also differ.
+- **Listed fares, not total trip cost.** Spirit and Frontier are the cheapest
+  option about 47% of the time, but they charge separately for bags. Their
+  real cost can be higher than the fare I compare.
 - **Uneven data collection.** 2 days are missing, and 19 of 171 days are
   partly collected. Gaps are not treated as price changes.
 - **Travelers search differently.** Some care about date, some about price,
@@ -135,6 +214,12 @@ Collected here for the final write-up's "what's next" section.
 - **Other years.** Re-run on data outside 2022.
 - **Traveler preferences.** Flexible dates, airline loyalty or miles, and
   round trips.
+- **"Should I buy?" demo app** (Streamlit): enter a route, date and price, and
+  get buy or wait with a probability.
+- **Live data collection** on routes I actually fly, to test the model on
+  prices it has never seen.
+- **Bag-fee-adjusted fares** for Spirit and Frontier.
+- **Julia port** of the MATLAB solver.
 
 ---
 
@@ -159,9 +244,13 @@ Built up as we go.
 
 ## Open questions
 
-- How consistently is each itinerary tracked, and do itineraries vanish before
-  departure (sold out?)? *(02)*
-- Do prices jump between fixed fare levels? The spikes in the fare histogram
-  suggest so. *(02)*
-- What exactly does `seatsRemaining` mean? It may be capped at 9 or 10. *(02)*
-- Which airlines appear, and are big ones missing from Expedia? *(02)*
+- ~~Is each itinerary tracked consistently?~~ No. The median itinerary is seen
+  on 7 days, and 58% vanish more than 3 days before departure. That's why the
+  analysis follows the cheapest option per trip. *(02)*
+- ~~Do prices jump?~~ Yes. The cheapest fare is unchanged on 60% of days, and
+  when it moves the median move is $21 (14%). *(02)*
+- ~~Which airlines?~~ Spirit is most often the cheapest. Southwest is absent.
+  *(02)*
+- Are the steps at 21, 14 and 7 days advance-purchase deadlines? *(guess, 02)*
+- What exactly does `seatsRemaining` mean? Values run 0–10, with big spikes at
+  7 and 9, which looks like a display cap. It isn't needed yet.
