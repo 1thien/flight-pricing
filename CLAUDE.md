@@ -24,6 +24,10 @@ induction on a Markov chain of prices), with convergence studies. The
 optional demo app goes in Streamlit. The full method list per notebook is in
 `docs/project_journal.md`.
 
+`notebooks/math_reference.ipynb` (Markdown only) holds every equation and
+derivation step by step, in the order it first appears, in the user's voice.
+When a notebook introduces new math, add its section there too.
+
 Notebook numbering is reading order (01–09). Build order puts the
 resume-critical path first: 04, 05, 06, 09, then 03, 07, 08.
 

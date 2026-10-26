@@ -20,9 +20,41 @@ notebook it names.
   - `02_price_dynamics.ipynb`: how the cheapest fare moves as departure
     approaches. Built the core table with `scripts/build_cheapest.py`.
   - Full plan set: methods per notebook, R for econometrics, faster timeline.
-- **Next:** `04_decision_problem.ipynb` (the buy/wait math, scoring, simple
-  rules, threshold proof), then `05_backtest`.
-- **Waiting on me:** review notebooks 02 and 04.
+  - `04_decision_problem.ipynb`: setup, stopping times, scoring, simple
+    rules, threshold proof. Hindsight ceiling: about 30% ($53) from 60 days
+    out, about 8% from 14 days out.
+  - `flight_pricing/backtest.py` (strategy simulator) with tests in `tests/`.
+  - `05_backtest.ipynb` (day 2, done early). Blind waiting loses on a typical
+    trip except from 60 days out (about 8%). Walk-forward picks "buy now"
+    everywhere. Waiting pays on expensive fares and backfires on cheap ones,
+    so $ and % disagree. Sharp drop-offs after 21, 14 and 7 days.
+  - `06_model.ipynb` (day 3, done early). LightGBM drop-probability model with
+    an EV cutoff, walk-forward with the window and cutoff chosen on
+    validation. Saves 3.0% / 4.5% / 5.2% per trip ($5 / $9 / $12) from 60 /
+    45 / 30 days out, losing money on 1–7% of trips. About 2× logistic
+    regression. Fixed two leaks (right-censored labels, choosing the window
+    on test months) and made runs reproducible.
+  - `09_results.ipynb` v1: route-clustered bootstrap CIs and a paired test.
+    **Headline (30–60 days out): 4.5% saved per trip (95% CI 4.1–4.9%), 6.7%
+    of total spend, about $9.35 per trip, 4.3% of trips lose money.** Beats
+    "buy 21 days out" from 30 and 45 days out, loses to it from 60.
+  - `math_reference.ipynb`: derivations 1–25.
+  - README drafted (2026-10-26), with headline results and charts in
+    `docs/figures/`.
+  - `07_dynamic_programming.ipynb` + `matlab/`: jump model (MLE) and
+    empirical Markov chain, backward induction in MATLAB, walk-forward
+    backtest. **From 60 days out, DP saves about 6% per trip (11–12% of total
+    spend) vs. 3% for LightGBM.** It loses from 30 days out or closer, because
+    a route-relative state looks like reversion when it isn't. Numerics:
+    second-order grid convergence, Monte Carlo within 2 standard errors
+    (error ∝ 1/√N), linear interpolation beats pchip (kink), value of
+    waiting 19% → 0 by 14 days.
+  - R 4.6.1 plus fixest, duckdb, ggplot2 and modelsummary installed, and the R
+    kernel registered.
+- **Next:** `03_fare_econometrics` (R), then `08_reinforcement_learning`, then
+  add DP and RL to `09_results`. Deadline: Tuesday Oct 28, afternoon.
+- **Waiting on me:** review notebooks 02, 04, 05, 06, 09 and
+  `math_reference`, then commit them.
 
 ---
 
@@ -57,9 +89,11 @@ resume-critical path comes first.
 **Flight Purchase Timing Model** | Python, SQL (DuckDB), LightGBM, MATLAB
 
 - Built a buy-or-wait flight purchasing model on 82M Expedia fare records,
-  framing purchase timing as an optimal-stopping problem; walk-forward
-  backtest showed **$X (Y%) average savings** vs. a buy-now baseline (95%
-  bootstrap CI: $a–$b).
+  framing purchase timing as an optimal-stopping problem; a walk-forward
+  backtest over ~49K trip decisions showed **4.5% average savings per trip
+  (6.7% of total spend)** vs. a buy-now baseline (95% route-clustered
+  bootstrap CI: 4.1–4.9%), with only 4% of trips losing money. *(real numbers
+  from `09_results`, 2026-10-26)*
 - Built a data pipeline converting 31 GB of raw fare data to Parquet
   (31 → 4.5 GB) and querying it with SQL (DuckDB), tracking fares for 235
   routes over 171 days.
@@ -109,6 +143,10 @@ American option.
 | 8 | Offline reinforcement learning | `08_reinforcement_learning.ipynb` | |
 | 9 | Results: $ and %, bootstrap CIs, all strategies compared | `09_results.ipynb` | |
 | 10 | Write-up and presentation | `README.md`, this journal | |
+
+**Math reference:** `notebooks/math_reference.ipynb` has every equation and
+derivation step by step, in the order it first appears (sections 1–16 so
+far, covering notebooks 02–06). It grows as each notebook is added.
 
 **Methods by notebook**
 
@@ -238,7 +276,48 @@ Built up as we go.
 - **"How did you handle 82M rows?"** Converted to Parquet (columnar,
   compressed, 31 GB → 4.5 GB) and ran SQL on it with DuckDB. Only small
   results go into pandas.
-- **"How did you avoid lookahead bias?"** *(to be written in step 4)*
+- **"How did you avoid lookahead bias?"** Walk-forward by the month I'd make
+  the decision. Each test month learns only from trips that had **already
+  departed** before it began, because a trip's outcome isn't known until it
+  flies. Training on trips merely *searched* earlier would still leak. Every
+  strategy only acts on information up to that day (a stopping time). I also
+  show the cost of cheating: the "best N" picked on all the data claims 10%
+  savings from 60 days out, while the honest walk-forward version picks
+  "buy now". *(05)*
+- **"What leaks did you find?"** (1) Right-censoring: collection ended Oct 5,
+  so a "will it drop in 7 days?" label for a decision on Oct 1 is incomplete,
+  and a later drop would look like "no drop". Those labels are marked unknown.
+  (2) Choosing the label window by looking at test results. It's now chosen
+  on validation inside each fold. (3) Non-reproducible runs from row order
+  feeding LightGBM's sampling. Fixed by sorting. *(06)*
+- **"Why LightGBM over logistic regression?"** Trees capture interactions (a
+  high fare matters more far from departure), which roughly doubled the
+  savings. AUC 0.69–0.78 vs. 0.65–0.72. *(06)*
+- **"How confident are you in the 4.5%?"** The 95% CI is 4.1–4.9%, from a
+  bootstrap that resamples whole routes. Trips on the same route move
+  together, so treating them as independent would make the interval 2–3× too
+  narrow. *(09)*
+- **"Does it beat a simple rule?"** On the same trips, it beats "buy 21 days
+  out" by 6.1 points from 30 days out, but loses by 6.6 from 60 days out,
+  where fares decline slowly for weeks and the model's few-week view buys too
+  early. That's the motivation for the dynamic programming solver. *(09)*
+- **"Walk me through the dynamic programming."** The state is today's fare
+  relative to the route's usual fare, on a grid. Transitions come from either
+  the empirical Markov chain or a jump model fit by MLE (Bernoulli jump plus
+  normal size with pull-back κ ≈ −0.2). Backward induction in MATLAB is one
+  matrix-vector product per day. The solved policy is a threshold that rises
+  toward departure, matching the proof. It beat LightGBM from 60 days out
+  (about 6% vs. 3%) and lost from closer in, because the price model
+  mistakes persistent trip-level differences for temporary ones. *(07)*
+- **"How did you verify the numerics?"** Grid refinement from 25 to 1,600
+  points: second-order convergence (observed order about 2). Monte Carlo with
+  up to 10⁶ paths agreed within 2 standard errors, with standard error ∝
+  1/√N. Linear interpolation beat pchip because the value function has a
+  kink. *(07)*
+- **"Did dollars and percent ever disagree?"** Yes. Starting 45 days out,
+  "buy 21 days out" saves +$5.50 per trip and 4.7% of total spend, but the
+  average trip loses 0.5%. Waiting pays on expensive fares and backfires on
+  cheap ones. *(05)*
 
 ---
 
