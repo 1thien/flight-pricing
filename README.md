@@ -113,6 +113,10 @@ step by step in [`notebooks/math_reference.ipynb`](notebooks/math_reference.ipyn
   months ahead pays off.
 - **One season (Apr–Oct 2022), US domestic hubs, one-way fares** from a
   single source (Expedia). Southwest doesn't appear at all.
+- **The market has changed since.** Spirit Airlines, the cheapest option on
+  about a third of trip-days in this data, ceased operations in 2026. The
+  methods carry over, but the specific numbers describe the 2022 market, and
+  the model would need retraining on current fares.
 - **Listed fares, not total trip cost.** Budget airlines (Spirit, Frontier,
   often the cheapest option) charge separately for bags.
 - **One traveler profile:** "cheapest way from A to B on a fixed date."

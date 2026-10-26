@@ -90,7 +90,45 @@ resume-critical path comes first.
 
 ---
 
-## Resume bullets (drafts, numbers filled in from results)
+## Resume bullets (final, plain-language version, 2026-10-26)
+
+**Flight Purchase Timing Model** | Python, SQL, R, MATLAB
+
+- Built a model that decides whether to buy a plane ticket now or wait, using
+  82 million Expedia fare listings; on months it hadn't seen, it saved 4.5% per
+  ticket on average (95% CI: 4.1–4.9%) for travelers starting 1–2 months out.
+- Tested it only on flights after its training data had departed, and measured
+  uncertainty by resampling whole routes, which showed standard error bars were
+  2–3× too narrow.
+- Wrote a MATLAB program that computes the theoretically best buying rule from
+  a fitted model of fare movements, and verified its accuracy with
+  grid-refinement and simulation tests.
+- Used regression analysis in R to show fares rise 5–10% overnight when airlines'
+  21- and 14-day booking deadlines pass, while the day of the week you search
+  makes almost no difference.
+
+*Accuracy notes:* the 4.5% is the average for decisions starting 30, 45 or 60
+days before departure (09). The deadline jumps are +5.0% (21 days) and +9.7%
+(14 days) beyond the normal trend (03). The search-day effect is under 1% (03).
+
+## Resume bullets (keyword-heavy version, superseded)
+
+**Flight Purchase Timing Model** | Python, SQL, LightGBM, R, MATLAB
+
+- Framed airfare booking as an optimal-stopping problem and built a buy-or-wait
+  model on 82M Expedia fares; walk-forward backtest saved 4.5% per trip (95% CI
+  4.1–4.9%) vs. buying immediately.
+- Designed a leakage-free evaluation (walk-forward by departure date,
+  right-censored labels removed) with route-clustered bootstrap CIs, 2–3× wider
+  than naive intervals.
+- Solved the Bellman equation by backward induction in MATLAB on an MLE-fit
+  jump-process price model; verified second-order grid convergence and
+  Monte Carlo agreement.
+- Ran fixed-effects panel regressions in R on 2M trip-days, confirming 5–10%
+  fare jumps at advance-purchase deadlines and debunking the "book on Tuesday"
+  myth.
+
+## Resume bullets (earlier drafts)
 
 **Flight Purchase Timing Model** | Python, SQL (DuckDB), LightGBM, MATLAB
 
@@ -232,6 +270,12 @@ Each limitation comes with a way to phrase it when presenting.
 - **One source (Expedia).** Southwest doesn't appear at all. My guess is that
   it doesn't sell through Expedia, so a major low-fare airline is missing.
   Prices booked directly can also differ.
+- **The market has changed since 2022: Spirit Airlines ceased operations in
+  2026.** Spirit was the cheapest option on about a third of trip-days in
+  this data, so today's fare dynamics on those routes are different. The
+  methods carry over, but the model would need retraining on current data.
+  *Phrase:* "My data predates Spirit shutting down, a real regime change, so
+  I'd retrain and re-validate before trusting it today."
 - **Listed fares, not total trip cost.** Spirit and Frontier are the cheapest
   option about 47% of the time, but they charge separately for bags. Their
   real cost can be higher than the fare I compare.
