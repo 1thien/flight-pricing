@@ -32,6 +32,12 @@ the model never saw:
   fitted jump model) plans over the whole window and saves about **6% per trip
   from 60 days out**, twice the model's 3%, but loses closer in, where its
   simpler price model breaks down.
+- **Reinforcement learning (fitted Q-iteration)** learns the value of waiting
+  directly from past price paths, with no price model, and does best of all:
+  **about 10% per trip from 60 days out, 7.6% from 45 and 6.2% from 30**,
+  losing money on 5–10% of trips. Savings are positive in every test month but
+  vary by season (12–14% for June decisions, 2–7% later). Confidence intervals
+  for this comparison are being added to notebook 09.
 
 ## What the data shows
 
@@ -103,7 +109,7 @@ step by step in [`notebooks/math_reference.ipynb`](notebooks/math_reference.ipyn
 | [05 · Backtest](notebooks/05_backtest.ipynb) | Simple rules, walk-forward, lookahead bias |
 | [06 · Model](notebooks/06_model.ipynb) | LightGBM vs. logistic, EV rule, calibration, SHAP |
 | [07 · Dynamic programming](notebooks/07_dynamic_programming.ipynb) | Jump model, backward induction in MATLAB, convergence and Monte Carlo checks |
-| 08 · Reinforcement learning *(planned)* | Fitted Q-iteration |
+| [08 · Reinforcement learning](notebooks/08_reinforcement_learning.ipynb) | Fitted Q-iteration: the value of waiting learned directly from price paths |
 | [09 · Results](notebooks/09_results.ipynb) | Confidence intervals, paired comparisons |
 | [Math reference](notebooks/math_reference.ipynb) | Every equation, derived step by step |
 

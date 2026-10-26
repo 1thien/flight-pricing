@@ -57,8 +57,16 @@ notebook it names.
     the flight day matters (Sunday +35% vs. Tuesday). Spirit/Frontier
     presence goes with −36% fares. Reversal: AR(1) −0.28, VR(20) = 0.23.
     Math reference sections 26–30.
-- **Next:** `08_reinforcement_learning`, then add DP and RL to `09_results`.
-  Deadline: Tuesday Oct 28, afternoon.
+  - Resume bullets rewritten in plain language. Spirit's 2026 exit noted in
+    the README, the journal limitations and notebooks 02/03.
+  - `08_reinforcement_learning.ipynb`: fitted Q-iteration (59 day-by-day
+    LightGBM regressions, walk-forward). **Best approach so far: 9.8% / 7.6% /
+    6.2% per trip from 60 / 45 / 30 days out**, loses money on 5–10% of trips.
+    Positive in every month but seasonal (June 12–14%, Aug–Sep 2–4%). Math
+    reference section 31.
+- **Next:** update `09_results` with every strategy side by side
+  (route-clustered CIs and paired tests). If RL holds up with confidence
+  intervals, update the resume headline to its number.
 - **Waiting on me:** review notebooks 02, 04, 05, 06, 09 and
   `math_reference`, then commit them.
 
@@ -364,6 +372,13 @@ Built up as we go.
   up to 10⁶ paths agreed within 2 standard errors, with standard error ∝
   1/√N. Linear interpolation beat pchip because the value function has a
   kink. *(07)*
+- **"What did reinforcement learning add?"** It learns the value of waiting
+  directly from what happened on past trips (fitted Q-iteration: one
+  regression per day, fit backward from departure), so there's no price model
+  to get wrong and no stand-in target. It did best of all approaches (about 10%
+  from 60 days out vs. 3% for the classifier and 6% for DP), and it learned on
+  its own to buy just before the 21/14/7-day deadlines. Caveat: savings vary by
+  season (June 12–14%, Aug–Sep 2–4%). *(08)*
 - **"Is it cheaper to book on a Tuesday?"** No. Within the same trip, search
   day moves fares by under 1%. But flying on a Tuesday or Wednesday is much
   cheaper than flying on a Sunday (about 35%) or Friday (about 24%), on the
