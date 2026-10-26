@@ -42,6 +42,17 @@ the model never saw:
   One day out, the typical fare is 1.6× its usual level.
 - Prices **jump rather than drift**: the cheapest fare is unchanged on 60% of
   days, and when it moves, the median move is about 14%.
+- **Panel econometrics (R, `fixest`)** confirm the deadline jumps beyond the
+  smooth trend: **+5.0% at 21 days, +9.7% at 14, +2.2% at 7** (p < 0.001,
+  route-clustered).
+- **"Search on a Tuesday" is a myth** (the search day moves fares by under 1%),
+  but **the day you fly matters**: Sunday flights cost about 35% more than
+  Tuesday flights on the same route and month.
+- Routes where **Spirit or Frontier** has a real presence have fares about
+  **36% lower**, holding distance and concentration fixed (a correlation;
+  airlines choose their routes).
+- **Price moves partly reverse**: daily autocorrelation is −0.28, and the
+  variance ratio is 0.23 over 20 days.
 
 ![Average savings from waiting until N days out](docs/figures/wait_until_n.png)
 
@@ -87,7 +98,7 @@ step by step in [`notebooks/math_reference.ipynb`](notebooks/math_reference.ipyn
 |---|---|
 | [01 · Data overview](notebooks/01_data_overview.ipynb) | What's in the 82M rows, coverage, data quality |
 | [02 · Price dynamics](notebooks/02_price_dynamics.ipynb) | How the cheapest fare moves toward departure |
-| 03 · Fare econometrics *(in progress)* | Fixed effects, deadline discontinuities, day-of-week myth (R) |
+| [03 · Fare econometrics (R)](notebooks/03_fare_econometrics.ipynb) | Fixed effects, deadline discontinuities, day-of-week myth, Spirit effect, reversal |
 | [04 · Decision problem](notebooks/04_decision_problem.ipynb) | Optimal stopping setup, scoring, threshold proof |
 | [05 · Backtest](notebooks/05_backtest.ipynb) | Simple rules, walk-forward, lookahead bias |
 | [06 · Model](notebooks/06_model.ipynb) | LightGBM vs. logistic, EV rule, calibration, SHAP |

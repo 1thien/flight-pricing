@@ -51,8 +51,14 @@ notebook it names.
     waiting 19% → 0 by 14 days.
   - R 4.6.1 plus fixest, duckdb, ggplot2 and modelsummary installed, and the R
     kernel registered.
-- **Next:** `03_fare_econometrics` (R), then `08_reinforcement_learning`, then
-  add DP and RL to `09_results`. Deadline: Tuesday Oct 28, afternoon.
+  - Committed everything through notebook 07 (`585bc83`).
+  - `03_fare_econometrics.ipynb` (R): deadline jumps +5.0% / +9.7% / +2.2% at
+    21 / 14 / 7 days (p < 0.001). The search-day myth is debunked (<1%), but
+    the flight day matters (Sunday +35% vs. Tuesday). Spirit/Frontier
+    presence goes with −36% fares. Reversal: AR(1) −0.28, VR(20) = 0.23.
+    Math reference sections 26–30.
+- **Next:** `08_reinforcement_learning`, then add DP and RL to `09_results`.
+  Deadline: Tuesday Oct 28, afternoon.
 - **Waiting on me:** review notebooks 02, 04, 05, 06, 09 and
   `math_reference`, then commit them.
 
@@ -314,6 +320,17 @@ Built up as we go.
   up to 10⁶ paths agreed within 2 standard errors, with standard error ∝
   1/√N. Linear interpolation beat pchip because the value function has a
   kink. *(07)*
+- **"Is it cheaper to book on a Tuesday?"** No. Within the same trip, search
+  day moves fares by under 1%. But flying on a Tuesday or Wednesday is much
+  cheaper than flying on a Sunday (about 35%) or Friday (about 24%), on the
+  same route and in the same month. *(03)*
+- **"How do you know the deadline effect is real?"** A regression
+  discontinuity on daily log-fare changes, with a cubic trend and route fixed
+  effects, clustered by route: +5.0% at 21 days, +9.7% at 14, +2.2% at 7, all
+  p < 0.001. *(03)*
+- **"Is the Spirit effect causal?"** No. Airlines choose their routes, so it's
+  correlation. A causal estimate would need route-entry events over time
+  (difference-in-differences). *(03)*
 - **"Did dollars and percent ever disagree?"** Yes. Starting 45 days out,
   "buy 21 days out" saves +$5.50 per trip and 4.7% of total spend, but the
   average trip loses 0.5%. Waiting pays on expensive fares and backfires on
