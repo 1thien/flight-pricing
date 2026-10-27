@@ -54,6 +54,11 @@ intervals 2–3× too narrow).
   airlines choose their routes).
 - **Price moves partly reverse**: daily autocorrelation is −0.28, and the
   variance ratio is 0.23 over 20 days.
+- **How long does a fare last?** (survival analysis): a fare seen 60 days out
+  typically lasts about 18 days before rising 5%; from 21 days out, about 3.
+  Starting exactly 21 days out, 38% of fares rise 5% the next day, when the
+  deadline passes. Far out, the next 5% move is more often a drop (56% from 60
+  days); close in, it's more often a rise (64% from 21 days).
 
 ![Average savings from waiting until N days out](docs/figures/wait_until_n.png)
 
@@ -113,7 +118,8 @@ step by step in [`notebooks/math_reference.ipynb`](notebooks/math_reference.ipyn
 | [06 · Model](notebooks/06_model.ipynb) | LightGBM vs. logistic, EV rule, calibration, SHAP |
 | [07 · Dynamic programming](notebooks/07_dynamic_programming.ipynb) | Jump model, backward induction in MATLAB, convergence and Monte Carlo checks |
 | [08 · Reinforcement learning](notebooks/08_reinforcement_learning.ipynb) | Fitted Q-iteration: the value of waiting learned directly from price paths |
-| [09 · Results](notebooks/09_results.ipynb) | Confidence intervals, paired comparisons |
+| [09 · Results](notebooks/09_results.ipynb) | Every strategy compared, with confidence intervals and paired tests |
+| [10 · Survival analysis (R)](notebooks/10_survival_analysis.ipynb) | How long a fare lasts: Kaplan–Meier, competing risks, Cox model |
 | [Math reference](notebooks/math_reference.ipynb) | Every equation, derived step by step |
 
 ## Limitations

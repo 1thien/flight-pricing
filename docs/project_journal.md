@@ -70,9 +70,16 @@ notebook it names.
     LightGBM in paired tests from 21 to 60 days out, ties "buy 21" from 60, and
     beats DP everywhere. Seasonal: June 13%, Aug–Sep 2–3%.
   - Resume headline updated to 7.5% (see Resume bullets).
-- **Next (optional extras):** a "What kind of problem is this?" framing section
-  (optimal stopping ⊂ MDP ⊂ stochastic optimization), recalibration, survival
-  analysis, and the demo app. Then interview practice.
+  - Framing section ("What kind of problem is this?") added to notebook 04
+    and the top of the math reference.
+  - `10_survival_analysis.ipynb` (R): median time until a 5% rise is 18 / 11 /
+    10 / 3 days from 60 / 45 / 30 / 21 days out. Deadline cliffs: 38% rise the
+    day after 21 days. Competing risks: a drop comes first 56% from 60 days, a
+    rise 64% from 21. Cox: expensive fares rise more slowly (HR 0.45); robust
+    to stratifying by start. Math reference sections 32–35.
+- **Next (optional extras):** recalibrating LightGBM probabilities,
+  conformal prediction intervals, route clustering, the demo app. Then
+  interview practice.
 - **Waiting on me:** review notebooks 02, 04, 05, 06, 09 and
   `math_reference`, then commit them.
 
@@ -410,6 +417,15 @@ Built up as we go.
   from 60 days out vs. 3% for the classifier and 6% for DP), and it learned on
   its own to buy just before the 21/14/7-day deadlines. Caveat: savings vary by
   season (June 12–14%, Aug–Sep 2–4%). *(08)*
+- **"How long do I have before a fare goes up?"** Survival analysis with
+  censoring, since many fares never rise before departure. Median time to a 5%
+  rise: about 18 days from 60 days out, about 3 days from 21 days out. Cheap
+  fares rise fastest. Kaplan–Meier, competing risks (which 5% move comes
+  first), Cox model with route-clustered errors. *(10)*
+- **"Why not just average the time until a rise?"** Censoring. Trips that
+  never rose before departure would either be dropped (biasing toward short
+  times) or counted wrongly. Kaplan–Meier uses "lasted at least this long"
+  correctly. *(10)*
 - **"Is it cheaper to book on a Tuesday?"** No. Within the same trip, search
   day moves fares by under 1%. But flying on a Tuesday or Wednesday is much
   cheaper than flying on a Sunday (about 35%) or Friday (about 24%), on the
