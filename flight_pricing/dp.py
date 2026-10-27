@@ -112,6 +112,39 @@ def load_outputs(path):
     return {k: v for k, v in loadmat(path).items() if not k.startswith("__")}
 
 
+def walk_forward_dp(trips, F, test_months, workdir, K=60, model="jump", objective="price"):
+    """Buy matrix B (n_trips x 61) from the DP policy, walk-forward by month.
+
+    Each decision day uses the policy solved from trips that departed before
+    the month of that day's search date, the same convention as the other
+    strategies. Days outside the test months default to buy.
+    """
+    flight = pd.to_datetime(trips.flightDate)
+    edges, centers = grid(K)
+    Xs, Ms, params = [], [], {k: [] for k in ("lam", "mu", "kappa", "sigma")}
+    for m in test_months:
+        train = (flight < m.start_time).to_numpy()
+        X = relative_log_fare(F, route_reference(F, trips, train))
+        Xs.append(X)
+        Ms.append(transition_matrices(X, train, K))
+        for k, v in fit_jump_model(X, train).items():
+            params[k].append(v)
+    save_inputs(Path(workdir) / "dp_input.mat", edges=edges, centers=centers,
+                M_markov=np.stack(Ms, axis=3), **{k: np.column_stack(v) for k, v in params.items()})
+    run_matlab("solve_folds", workdir)
+    C = load_outputs(Path(workdir) / "dp_output.mat")[f"C_{model}_{objective}"]
+
+    days = np.arange(F.shape[1])
+    search_month = (flight.to_numpy()[:, None] - days[None, :] * np.timedelta64(1, "D")).astype("datetime64[M]")
+    B = np.ones(F.shape, dtype=bool)
+    for f, m in enumerate(test_months):
+        in_month = search_month == np.datetime64(str(m), "M")
+        Bf = dp_buy_matrix(Xs[f], C[:, :, f], centers, objective)
+        B[in_month] = Bf[in_month]
+    B[:, 1] = True
+    return B
+
+
 def dp_buy_matrix(X, C, centers, objective="price"):
     """B[i, t] = True when buying now is no worse than the continuation value:
     cost(x) <= C_t(x), with C_t linearly interpolated between grid points.

@@ -9,35 +9,30 @@ walk-forward backtest on 82 million Expedia fares.
 
 ## Result
 
-Starting 30–60 days before departure, tested on about 49,000 trip decisions
-the model never saw:
+Three strategies, each trained only on flights that had already departed and
+tested on decisions starting 30–60 days before departure (June–September 2022):
 
-| Metric | Result | 95% CI (cluster bootstrap by route) |
-|---|---|---|
-| Average saved per trip vs. buying immediately | **4.5%** | 4.1–4.9% |
-| Share of total spend saved | **6.7%** | 6.2–7.3% |
-| Dollars saved per trip | **$9.35** | $8.35–$10.42 |
-| Trips where waiting cost money | **4.3%** | 3.6–5.1% |
+| Strategy | Avg. saved per trip | Share of total spend saved | Trips that lost money |
+|---|---|---|---|
+| LightGBM: predict a fare drop, wait if likely | 4.5% (4.1–4.9) | 6.7% (6.2–7.3) | 4.3% |
+| Dynamic programming on a fitted price model | 1.3% (−1.3–3.8) | 6.6% (4.5–8.6) | 9.8% |
+| **Reinforcement learning: learn the value of waiting from data** | **7.5% (6.6–8.2)** | **11.3% (10.4–12.1)** | 7.0% |
 
-![Model savings by starting point, with 95% confidence intervals](docs/figures/savings_ci.png)
+95% confidence intervals in parentheses, from a bootstrap that resamples whole
+routes (trips on the same route aren't independent; ignoring that makes the
+intervals 2–3× too narrow).
 
-- Savings are clearly above zero from 21 to 60 days out. From 14 days out
-  there's too little left to win to claim any.
-- The model saves more on expensive tickets: 3% under $200, 11% for
-  $200–500, 19% over $500.
-- On the same trips, it beats the simple rule "buy 21 days out" when
-  starting 30 or 45 days out, but **loses to it from 60 days out**, where
-  fares drift down slowly for weeks.
-- A **dynamic-programming policy** (Bellman equation solved in MATLAB on a
-  fitted jump model) plans over the whole window and saves about **6% per trip
-  from 60 days out**, twice the model's 3%, but loses closer in, where its
-  simpler price model breaks down.
-- **Reinforcement learning (fitted Q-iteration)** learns the value of waiting
-  directly from past price paths, with no price model, and does best of all:
-  **about 10% per trip from 60 days out, 7.6% from 45 and 6.2% from 30**,
-  losing money on 5–10% of trips. Savings are positive in every test month but
-  vary by season (12–14% for June decisions, 2–7% later). Confidence intervals
-  for this comparison are being added to notebook 09.
+![Savings by strategy and starting point, with 95% confidence intervals](docs/figures/savings_ci.png)
+
+- **Reinforcement learning wins.** It beats the LightGBM model on the same
+  trips from every starting point from 21 to 60 days out (all paired intervals
+  above zero), and it beats dynamic programming everywhere.
+- **The simple rule "buy 21 days out" ties it from 60 days out**, then fails
+  from closer in, where blind waiting runs into the late price climb.
+- **Savings are larger on expensive tickets:** 5% under $200, 19% for
+  $200–500, 30% over $500.
+- **Savings depend on the season:** about 13% for decisions made in June, 2–3%
+  in August–September. That's the main caveat on every number here.
 
 ## What the data shows
 
@@ -80,11 +75,19 @@ the model never saw:
    (per-trip average and share of total spend).
 3. **Theory.** From the Bellman equation, the optimal policy is a threshold:
    buy once the fare is below a cutoff that rises as departure approaches.
-4. **Model.** LightGBM estimates the probability that the fare drops at least
-   5% within the next *h* days, using only same-day information: fare vs. the
+4. **Three ways to decide.**
+   - **Predict, then threshold:** LightGBM estimates the probability that the
+     fare drops at least 5% within the next *h* days, and I wait while that
+     probability exceeds a cutoff θ (the expected-value rule *p > L / (G + L)*).
+   - **Dynamic programming:** fit a jump-process model of daily fare moves by
+     maximum likelihood, then solve the Bellman equation backward in MATLAB.
+   - **Reinforcement learning:** fitted Q-iteration learns the value of waiting
+     directly from what happened on past trips, one regression per day, with
+     no price model.
+
+   All use only information available on the decision day: fare vs. the
    route's usual level, days to departure, recent moves, what's on offer, and
-   the route. Wait while that probability exceeds a cutoff θ, which is the
-   expected-value rule *p > L / (G + L)*.
+   the route.
 5. **Honest evaluation.** Walk-forward by month. Each test month learns only
    from trips that had **already departed**. The label window *h* and the
    cutoff θ are chosen on a validation set, never on the test month. Labels

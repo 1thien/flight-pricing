@@ -64,9 +64,15 @@ notebook it names.
     6.2% per trip from 60 / 45 / 30 days out**, loses money on 5–10% of trips.
     Positive in every month but seasonal (June 12–14%, Aug–Sep 2–4%). Math
     reference section 31.
-- **Next:** update `09_results` with every strategy side by side
-  (route-clustered CIs and paired tests). If RL holds up with confidence
-  intervals, update the resume headline to its number.
+  - `09_results` v2: every strategy side by side with route-clustered CIs.
+    **RL pooled 30–60 days out: 7.5% per trip (95% CI 6.6–8.2%), 11.3% of total
+    spend (10.4–12.1%), $15.66 per trip, 7.0% of trips lose money.** It beats
+    LightGBM in paired tests from 21 to 60 days out, ties "buy 21" from 60, and
+    beats DP everywhere. Seasonal: June 13%, Aug–Sep 2–3%.
+  - Resume headline updated to 7.5% (see Resume bullets).
+- **Next (optional extras):** a "What kind of problem is this?" framing section
+  (optimal stopping ⊂ MDP ⊂ stochastic optimization), recalibration, survival
+  analysis, and the demo app. Then interview practice.
 - **Waiting on me:** review notebooks 02, 04, 05, 06, 09 and
   `math_reference`, then commit them.
 
@@ -98,7 +104,28 @@ resume-critical path comes first.
 
 ---
 
-## Resume bullets (final, plain-language version, 2026-10-26)
+## Resume bullets (current, 2026-10-26)
+
+**Airfare Purchase Optimization** | Python, SQL, R, MATLAB
+
+- Developed a buy-or-wait airfare model that cut ticket costs by 7.5% on average
+  in backtests by learning when fares are likely to drop
+- Prevented look-ahead bias by training only on flights that had already
+  departed, and corrected overly narrow error bars by accounting for
+  correlation within routes
+- Used fixed-effects regressions to reveal statistically significant fare jumps
+  at airline booking deadlines, informing when to buy
+- Computed the optimal buy-or-wait price threshold for each day before
+  departure using dynamic programming, verified with convergence and
+  simulation tests
+
+*Backing for 7.5%:* reinforcement-learning policy, decisions starting 30–60
+days out, walk-forward June–Sept 2022, 95% CI 6.6–8.2% (route-clustered),
+11.3% of total spend; about 2–13% depending on the season (09). The earlier
+4.5% (LightGBM, CI 4.1–4.9%) is still valid if a more conservative figure is
+preferred.
+
+## Resume bullets (plain-language draft, 2026-10-26, superseded)
 
 **Flight Purchase Timing Model** | Python, SQL, R, MATLAB
 
