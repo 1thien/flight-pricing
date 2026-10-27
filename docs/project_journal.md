@@ -106,7 +106,11 @@ resume-critical path comes first.
 
 ## Resume bullets (current, 2026-10-26)
 
-**Airfare Purchase Optimization** | Python, SQL, R, MATLAB
+*Tools line, decided 2026-10-26:* **Python, SQL, MATLAB**. R stays part of the
+project (notebook 03) and I'll keep working with it, but I'm leaving it off
+the resume for now, until I can comfortably walk through the R work.
+
+**Airfare Purchase Optimization** | Python, SQL, MATLAB
 
 - Developed a buy-or-wait airfare model that cut ticket costs by 7.5% on average
   in backtests by learning when fares are likely to drop
