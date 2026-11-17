@@ -12,7 +12,7 @@ notebook it names.
 
 ## Where we left off
 
-*Last updated 2026-10-23 (plan day 1)*
+*Last updated 2026-11-02*
 
 - **Done:**
   - Data downloaded and converted (82M rows).
@@ -77,11 +77,14 @@ notebook it names.
     day after 21 days. Competing risks: a drop comes first 56% from 60 days, a
     rise 64% from 21. Cox: expensive fares rise more slowly (HR 0.45); robust
     to stratifying by start. Math reference sections 32–35.
-- **Next (optional extras):** recalibrating LightGBM probabilities,
-  conformal prediction intervals, route clustering, the demo app. Then
-  interview practice.
-- **Waiting on me:** review notebooks 02, 04, 05, 06, 09 and
-  `math_reference`, then commit them.
+  - Everything committed and pushed (`463bccc`).
+  - Resume bullet reworded (2026-11-02): the 7.5% comes from reinforcement
+    learning, which learns *when waiting is worth it*, not "when fares are
+    likely to drop" (that describes the LightGBM classifier). 30-second and
+    2-minute pitches drafted (see Interview prep).
+- **Next:** pick an extension (see Building on this project). Interview
+  practice on the pitches in parallel.
+- **Waiting on me:** rehearse the pitches out loud; check they sound like me.
 
 ---
 
@@ -120,7 +123,7 @@ the resume for now, until I can comfortably walk through the R work.
 **Airfare Purchase Optimization** | Python, SQL, MATLAB
 
 - Developed a buy-or-wait airfare model that cut ticket costs by 7.5% on average
-  in backtests by learning when fares are likely to drop
+  in backtests by learning from past fare histories when waiting is worth it
 - Prevented look-ahead bias by training only on flights that had already
   departed, and corrected overly narrow error bars by accounting for
   correlation within routes
@@ -225,18 +228,19 @@ American option.
 |---|---|---|---|
 | 1 | Get the data | `scripts/download_data.py`, `scripts/build_parquet.py` | Done |
 | 2 | Understand the data | `01_data_overview.ipynb`, `02_price_dynamics.ipynb` | Done |
-| 3 | Explain fares: panel econometrics (R) | `03_fare_econometrics.ipynb` | |
-| 4 | Define the decision precisely, with the threshold proof | `04_decision_problem.ipynb` | |
-| 5 | Backtest framework and simple rules, before any model | `05_backtest.ipynb` | |
-| 6 | Model: drop probability, EV rule, calibration, SHAP | `06_model.ipynb` | |
-| 7 | Numerical DP (MATLAB), jump process, real options | `matlab/` + `07_dynamic_programming.ipynb` | |
-| 8 | Offline reinforcement learning | `08_reinforcement_learning.ipynb` | |
-| 9 | Results: $ and %, bootstrap CIs, all strategies compared | `09_results.ipynb` | |
-| 10 | Write-up and presentation | `README.md`, this journal | |
+| 3 | Explain fares: panel econometrics (R) | `03_fare_econometrics.ipynb` | Done |
+| 4 | Define the decision precisely, with the threshold proof | `04_decision_problem.ipynb` | Done |
+| 5 | Backtest framework and simple rules, before any model | `05_backtest.ipynb` | Done |
+| 6 | Model: drop probability, EV rule, calibration, SHAP | `06_model.ipynb` | Done |
+| 7 | Numerical DP (MATLAB), jump process, real options | `matlab/` + `07_dynamic_programming.ipynb` | Done |
+| 8 | Offline reinforcement learning | `08_reinforcement_learning.ipynb` | Done |
+| 9 | Results: $ and %, bootstrap CIs, all strategies compared | `09_results.ipynb` | Done |
+| 10 | How long a fare lasts: survival analysis (R) | `10_survival_analysis.ipynb` | Done |
+| 11 | Write-up and presentation | `README.md`, this journal | README done; pitches drafted |
 
 **Math reference:** `notebooks/math_reference.ipynb` has every equation and
-derivation step by step, in the order it first appears (sections 1–16 so
-far, covering notebooks 02–06). It grows as each notebook is added.
+derivation step by step, in the order it first appears (sections 1–35,
+covering notebooks 02–10). It grows as each notebook is added.
 
 **Methods by notebook**
 
@@ -248,7 +252,8 @@ far, covering notebooks 02–06). It grows as each notebook is added.
 | 06 | Logistic regression, LightGBM, quantile regression (pinball loss), expected-value rule, calibration (reliability, Brier), SHAP; extras: conformal prediction, Optuna tuning, empirical Bayes, route clustering |
 | 07 | Markov chain estimation, backward induction, grid convergence, Monte Carlo error, interpolation, compound Poisson jump process (MLE), real-options value of waiting |
 | 08 | Fitted Q-iteration (offline RL) |
-| 09 | Cluster bootstrap CIs, paired comparison; extra: survival analysis of fare increases |
+| 09 | Cluster bootstrap CIs, paired comparison |
+| 10 | Survival analysis: Kaplan–Meier, competing risks, Cox model |
 
 ---
 
@@ -257,15 +262,27 @@ far, covering notebooks 02–06). It grows as each notebook is added.
 | # | Decision | Where it's explained |
 |---|---|---|
 | D1 | Frame as buy-or-wait (optimal stopping), not price prediction | This page, Motivation |
-| D2 | Measure savings in **$ and %** (my idea): mean per-trip % and total-$ %, plus by fare band | `CLAUDE.md`; to be shown in `07_results` |
+| D2 | Measure savings in **$ and %** (my idea): mean per-trip % and total-$ %, plus by fare band | `CLAUDE.md`; shown in `09_results` |
 | D3 | Keep the data outside the repo (OneDrive would upload 31 GB) | This page, below |
 | D4 | Parquet + DuckDB (SQL) instead of loading 82M rows into pandas | This page, below |
-| D5 | The traveler buys the **cheapest option A→B on a date, basic economy included**; flexible-date and airline-specific variants as extensions | `02_price_dynamics` (why not one itinerary), `03_decision_problem` (to come) |
+| D5 | The traveler buys the **cheapest option A→B on a date, basic economy included**; flexible-date and airline-specific variants as extensions | `02_price_dynamics` (why not one itinerary), `04_decision_problem` |
 | D6 | Python + SQL, with MATLAB for numerical DP (Octave-compatible, since the license is through Drexel). No C++, Julia or R for now | This page, below |
 
 | D7 | **R** for the econometrics notebook (`fixest`, `ggplot2`, `modelsummary`) | This page, below |
 | D8 | Optional demo app in **Python (Streamlit)**, since the model is in Python | This page, below |
 | D9 | Backtest starting points: 60, 45, 30, 21 and 14 days out, reported separately. Listed fares, with bag fees noted as a limitation | `04_decision_problem` |
+
+| D10 | Next extension: **re-test on fresh fares** (2026), not more analysis on 2022. Source: Google Flights via SerpApi, since the Amadeus free API shut down on 2026-07-17 and no public dataset has recent daily fare paths. First step: `scripts/probe_serpapi.py` checks whether `price_history` gives a daily path per trip | This page, below |
+
+**D10 detail (2026-11-02):** the biggest caveats are one summer (2–13% by
+month) and a market that has changed (Spirit is gone). A fresh test fixes
+both and lets me add the international routes I fly and horizons past 60
+days. Open design points: (1) the 2022 model uses Expedia-only features
+(`seatsRemaining`, `n_options`, basic-economy flag), so a frozen test needs
+a policy retrained on features both sources share; (2) international routes
+were never seen in 2022, so they need their own training data; (3) Google's
+history may be smoothed or not the same "cheapest one-way" fare, so check
+it against a few days of my own daily searches.
 
 **D7/D8 detail:** Python could do the econometrics (`pyfixest`, `linearmodels`),
 but `fixest` is the standard tool economists use, and its regression tables
@@ -361,6 +378,70 @@ Collected here for the final write-up's "what's next" section.
 
 Built up as we go.
 
+### 30-second pitch
+
+> I travel a lot, and I'm always asking whether to book now or wait. I
+> treated that as an optimal stopping problem, the same math as deciding
+> when to exercise an American option. On 82 million Expedia fares, I
+> compared three ways to decide: a classifier that predicts fare drops,
+> dynamic programming on a fitted price model, and reinforcement learning
+> that learns the value of waiting straight from past trips. In a backtest
+> that only ever trained on flights that had already departed, the
+> reinforcement learning policy saved 7.5% per trip versus buying right
+> away, with a 95% confidence interval of 6.6 to 8.2%.
+
+### 2-minute version
+
+> **The question.** Every traveler asks "book now or will it get cheaper?"
+> Most people answer with folk rules like "book on a Tuesday." I wanted a
+> rule I could measure in dollars.
+>
+> **The data.** 82 million one-way US fares scraped from Expedia in 2022,
+> 1 to 60 days before departure. 31 GB of CSV, which I converted to Parquet
+> and queried with SQL in DuckDB. For each route and flight date I tracked
+> the cheapest fare each day.
+>
+> **What the data shows.** Fares jump rather than drift. They're flat from
+> about 45 to 14 days out, then step up at 21, 14 and 7 days, which are
+> airline booking deadlines. Fixed-effects regressions put those jumps at
+> 5–10%. And the Tuesday rule is a myth: the search day moves fares by
+> under 1%.
+>
+> **The decision.** Each day you either buy or wait, using only what you
+> know that day. That's an optimal stopping problem, and the Bellman
+> equation says the best rule is a price threshold that rises toward
+> departure. I tried three ways to set it: a LightGBM model of the chance
+> of a 5% drop, dynamic programming on a jump-process price model solved
+> in MATLAB, and fitted Q-iteration, a reinforcement learning method that
+> learns the value of waiting from past fare paths with no price model.
+>
+> **The evaluation.** Walk-forward by month: each test month learns only
+> from flights that had already departed, because a trip's outcome isn't
+> known until it flies. Confidence intervals come from a bootstrap that
+> resamples whole routes, since trips on the same route move together.
+> Ignoring that makes the intervals 2–3× too narrow.
+>
+> **The result.** Reinforcement learning won: 7.5% saved per trip and 11.3%
+> of total spend, starting 30–60 days out. It captures about a third of
+> what perfect hindsight would save. Two honest caveats: the simple rule
+> "buy 21 days out" ties it from 60 days out, and savings depend on the
+> season, about 13% in June and 2–3% in late summer. So the next step is
+> testing it on another year of data.
+
+**Weak spots to have answers ready for:**
+- *The CI only covers route-to-route variation.* All four test months are
+  one summer, and savings range 2–13% by month. A new season is the real
+  test.
+- *Why RL beats DP:* DP's state is the fare relative to the route's usual
+  level, so a trip that's persistently pricier than its route (a holiday
+  weekend, say) looks like a temporary high that should revert, and DP waits
+  for a drop that never comes. RL never models prices, so it can't make
+  that mistake. *(07, 08)*
+- *Why "buy 21 days out" ties from 60 days:* fares ease from 60 to about 45
+  days out and then stay flat until the 21-day deadline, so waiting blindly
+  until just before it catches the decline at little cost. From 45 or 30
+  days out there's no decline left, only the deadline climb. *(05, 09)*
+
 - **"Why this project?"** Personal: I travel a lot and always hunt for fares.
   Professional: it's a real decision under uncertainty, with a measurable payoff.
 - **"What would you do differently?"** Get data further than 60 days out and
@@ -453,6 +534,9 @@ Built up as we go.
   when it moves the median move is $21 (14%). *(02)*
 - ~~Which airlines?~~ Spirit is most often the cheapest. Southwest is absent.
   *(02)*
-- Are the steps at 21, 14 and 7 days advance-purchase deadlines? *(guess, 02)*
+- ~~Are the steps at 21, 14 and 7 days advance-purchase deadlines?~~ Almost
+  certainly. Fares jump +5.0% / +9.7% / +2.2% exactly at those days beyond
+  the smooth trend (p < 0.001), and 38% of fares rise the day after 21.
+  *(03, 10)*
 - What exactly does `seatsRemaining` mean? Values run 0–10, with big spikes at
   7 and 9, which looks like a display cap. It isn't needed yet.
